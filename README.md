@@ -5,7 +5,7 @@ A tool to load env files into the environment
 Add to your `cargo.toml` file
 ```toml
 [dependencies]
-rustdotenv = "0.1.0"
+rustdotenv = "0.1.1"
 ```
 
 ## Usage

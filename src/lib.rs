@@ -8,6 +8,7 @@ use std::io;
 use std::path::Path;
 use envfile::EnvFile;
 
+/// Checks if an env variables already exists, if it exists it will be skipped
 pub fn load(_filenames: Option<Vec<&str>>) {
     let filenames = filenames_or_default(_filenames);
 
@@ -19,11 +20,15 @@ pub fn load(_filenames: Option<Vec<&str>>) {
     }
 }
 
+/// Overwrites an env variable if it already exists
 pub fn overload(_filenames: Option<Vec<&str>>) {
     let filenames = filenames_or_default(_filenames);
 
     for i in filenames {
-        load_file(i, true);
+        let err = load_file(i, true);
+        if err.is_some() {
+            return;
+        }
     }
 }
 
