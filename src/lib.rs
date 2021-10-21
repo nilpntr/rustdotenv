@@ -8,6 +8,14 @@ use std::io;
 use std::path::Path;
 use envfile::EnvFile;
 
+/// Check if env variable DEV=true, if so it runs the load function with the provided filenames
+pub fn load_dev(_filenames: Option<Vec<&str>>) {
+    let dev = std::env::var("DEV");
+    if dev.is_ok() && dev.unwrap() == "true" {
+        load(_filenames);
+    }
+}
+
 /// Checks if an env variables already exists, if it exists it will be skipped
 pub fn load(_filenames: Option<Vec<&str>>) {
     let filenames = filenames_or_default(_filenames);
@@ -59,8 +67,8 @@ fn load_file(filename: &str, overload: bool) -> Option<io::Error> {
 mod tests {
     use crate::load;
 
-    fn env_is_set() -> bool {
-        match std::env::var("MONGO_URI") {
+    fn env_is_set(key: &str) -> bool {
+        match std::env::var(key) {
             Ok(s) => s == "mongodb://admin:password@127.0.0.1:27017/?authSource=admin",
             _ => false
         }
@@ -69,6 +77,7 @@ mod tests {
     #[test]
     fn it_works() {
         load(None);
-        assert!(env_is_set());
+        assert_eq!(env_is_set("MONGO_URI"), true);
+        assert_eq!(env_is_set("MYSQL_URI"), false);
     }
 }
