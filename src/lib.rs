@@ -8,9 +8,9 @@ use std::io;
 use std::path::Path;
 use envfile::EnvFile;
 
-/// Check if env variable DEV=true, if so it runs the load function with the provided filenames
-pub fn load_dev(_filenames: Option<Vec<&str>>) {
-    let dev = std::env::var("DEV");
+/// Check if the provided env name equals true like DEV=true, if so it runs the load function with the provided filenames
+pub fn load_if_set(env_name: &str, _filenames: Option<Vec<&str>>) {
+    let dev = std::env::var(env_name);
     if dev.is_ok() && dev.unwrap() == "true" {
         load(_filenames);
     }
@@ -67,9 +67,9 @@ fn load_file(filename: &str, overload: bool) -> Option<io::Error> {
 mod tests {
     use crate::load;
 
-    fn env_is_set(key: &str) -> bool {
+    fn env_is_set(key: &str, value: &str) -> bool {
         match std::env::var(key) {
-            Ok(s) => s == "mongodb://admin:password@127.0.0.1:27017/?authSource=admin",
+            Ok(s) => s == value,
             _ => false
         }
     }
@@ -77,7 +77,7 @@ mod tests {
     #[test]
     fn it_works() {
         load(None);
-        assert_eq!(env_is_set("MONGO_URI"), true);
-        assert_eq!(env_is_set("MYSQL_URI"), false);
+        assert_eq!(env_is_set("MONGO_URI", "mongodb://admin:password@127.0.0.1:27017/?authSource=admin"), true);
+        assert_eq!(env_is_set("MYSQL_URI", "mysql://admin:password@127.0.0.1:3306"), false);
     }
 }
